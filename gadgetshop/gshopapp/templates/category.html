@@ -16,7 +16,7 @@
                     <h5>${{ product.price }}</h5>
                     <p class="card-text">{{ product.description }}</p>
                   </div>
-                  <a href="#"><button class="btn btn-danger">Add to cart</button></a> 
+                  <a href="{% url 'add_to_cart' product_slug=product.slug %}"><button class="btn btn-danger">Add to cart</button></a> 
                 </div>
               </div>
         {% endfor %}

@@ -25,21 +25,29 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
       <a class="navbar-brand" href="/">Start Bootstrap</a>
+      <ul class="nav navbar-nav ml-auto">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      {% if not request.get_full_path == '/' %}
-      <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Categories
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {% for category in categories %}
-            <a class="dropdown-item" href="{{ category.get_absolute_url }}">{{ category.name }}</a>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
+        <li class="nav-item">
+          {% if not request.get_full_path == '/' %}
+            <div class="dropdown">
+                <button class="btn nav-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Categories
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  {% for category in categories %}
+                  <a class="dropdown-item" href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+                  {% endfor %}
+                </div>
+              </div> 
+              {% endif %}
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'cart' %}">Cart <span class="badge">{{ cart.items.count }}</span></a>
+        </li> 
+      </ul>
+      
       </div>
   </nav>
 

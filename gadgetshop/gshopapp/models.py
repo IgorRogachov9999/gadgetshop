@@ -68,3 +68,24 @@ class Product(models.Model):
     
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
+
+
+class CartItem(models.Model):
+
+    product = models.ForeignKey(Product, models.CASCADE)
+    qty = models.PositiveIntegerField(default=1)
+    item_total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+
+
+    def __str__(self):
+        return "Cart item for {}".format(self.product.title)
+    
+
+class Cart(models.Model):
+
+    items = models.ManyToManyField(CartItem, blank=True)
+    cart_total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+
+
+    def __str__(self):
+        return str(self.id)
