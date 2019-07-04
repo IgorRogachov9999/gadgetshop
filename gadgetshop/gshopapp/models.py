@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.db.models.signals import pre_save
 from django.utils.text import slugify
 from django.urls import reverse
@@ -103,3 +104,36 @@ class Cart(models.Model):
             if cart_item.product == product:
                 self.items.remove(cart_item)
                 self.save()
+
+
+ORDER_STATUS_CHOICES = (
+    ('In processing', 'In processing'),
+    ('Performed', 'Performed'),
+    ('Paid', 'Paid')
+)
+
+DELIVERY_CHOICES = (
+    ('Pickup', 'Pickup'), 
+    ('Delivery', 'Delivery')
+)
+
+
+class Order(models.Model):
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)
+    items = models.ManyToManyField(Cart)
+    total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
+    first_name = models.CharField(max_length=128)
+    last_name = models.CharField(max_length=128)
+    phone = models.CharField(max_length=16)
+    addres = models.CharField(max_length=255)
+    buing_type = models.CharField(max_length=32, choices=DELIVERY_CHOICES,
+                                  default=DELIVERY_CHOICES[0][1])
+    date = models.DateTimeField(auto_now_add=True)
+    comments = models.TextField()
+    status = models.CharField(max_length=64, choices=ORDER_STATUS_CHOICES,
+                              default=ORDER_STATUS_CHOICES[0][1])
+
+
+    def __str__(self):
+        return "Order #{}".format(str(self.id))

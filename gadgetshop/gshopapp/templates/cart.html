@@ -29,7 +29,14 @@
         <td class="text-center cart-total-price"><strong>${{ cart.cart_total }}</strong></td>
         <td></td>
     </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="text-center"><a href="{% url 'checkout' %}" class="pull-right"><button class="btn btn-danger">Pre order</button></a></td>
+    </tr>   
 </table>
+<br>
 </div>
 <h3 class="text-center cart-empty" style="display: none">Yours cart is empty</h3>
 {% else %}

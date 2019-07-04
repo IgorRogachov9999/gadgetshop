@@ -1,8 +1,9 @@
 from django.contrib import admin
-from gshopapp.models import Category, Brand, Product, CartItem, Cart
+from gshopapp.models import Category, Brand, Product, CartItem, Cart, Order
 
 admin.site.register(Category)
 admin.site.register(Brand)
 admin.site.register(Product)
 admin.site.register(Cart)
 admin.site.register(CartItem)
+admin.site.register(Order)
