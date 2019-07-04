@@ -44,7 +44,7 @@
               {% endif %}
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'cart' %}">Cart <span class="badge">{{ cart.items.count }}</span></a>
+            <a class="nav-link" href="{% url 'cart' %}">Cart <span id="cart-count" class="badge">{{ cart.items.count }}</span></a>
         </li> 
       </ul>
       
@@ -138,6 +138,9 @@
   <script src="{% static 'js/jquery.js' %}"></script>
   <script src="{% static 'js/bootstrap.js' %}"></script>
   
+  {% block script %}
+
+  {% endblock script %}
 
 </body>
 

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if cart.items.count > 0 %}
+<div class="my-cart">
 <h3 class="text-center">Your cart</h3>
 <table class="table">
     <tr>
@@ -10,12 +12,76 @@
         <td class="text-center"></td>
     </tr>
     {% for item in cart.items.all %}
-        <tr>
+        <tr class="cart-item-{{ item.product.id }}">
             <td class="text-center"><strong>{{ item.product.title }}</strong></td>
-            <td class="text-center"><strong>{{ item.qty }}</strong></td>
-            <td class="text-center"><strong>{{ item.item_total }}</strong></td>
-            <td class="text-center"><a href="{% url 'remove_from_cart' product_slug=item.product.slug %}">Remove</a></td>
+            <td class="text-center">
+                <form action="" method="get">
+                    <input type="number" class="cart-item-qty" data-id="{{ item.id }}" name="qty" value="{{ item.qty }}" min="1" style="width: 50px">
+                </form>
+            </td>
+            <td class="text-center" id="cart-item-total-{{ item.id }}">${{ item.item_total }}</td>
+            <td class="text-center"><a class="remove-from-cart" data-slug="{{ item.product.slug }}" data-id="{{ item.product.id }}" href="# ">Remove</a></td>
         </tr>   
     {% endfor %}
+    <tr>
+        <td></td>
+        <td class="text-center"><strong>Total: </strong></td>
+        <td class="text-center cart-total-price"><strong>${{ cart.cart_total }}</strong></td>
+        <td></td>
+    </tr>
 </table>
+</div>
+<h3 class="text-center cart-empty" style="display: none">Yours cart is empty</h3>
+{% else %}
+<h3 class="text-center">Yours cart is empty</h3>
+{% endif %}
 {% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+        $('.remove-from-cart').on('click', function(e) {
+            e.preventDefault()
+            product_slug = $(this).attr('data-slug')
+            item_product_id = $(this).attr('data-id')
+            data = {
+                product_slug: product_slug
+            }
+            $.ajax({
+                type: "GET",
+                url: "{% url 'remove_from_cart' %}",
+                data: data,
+                success: function(data) {
+                    $("#cart-count").html(data.cart_total)
+                    $(".cart-item-" + item_product_id).css('display', 'none')
+                    $('.cart-total-price').html('<strong>$' + parseFloat(data.cart_total_price).toFixed(2) + '</strong>')
+                    if (parseInt(data.cart_total) == 0) {
+                        $('.my-cart').css('display', 'none')
+                        $('.cart-empty').css('display', 'block')
+                    }
+                }
+            })
+        })
+    })
+
+    $(document).ready(function() {
+        $('.cart-item-qty').on('click', function() {
+            qty = $(this).val()
+            item_id = $(this).attr('data-id')
+            data = {
+                qty: qty,
+                item_id: item_id
+            }
+            $.ajax({
+                type: 'GET',
+                url: '{% url "change_item_qty" %}',
+                data: data,
+                success: function(data) {
+                    $('#cart-item-total-' + item_id).html('$' + parseFloat(data.item_total).toFixed(2))
+                    $('.cart-total-price').html('<strong>$' + parseFloat(data.cart_total_price).toFixed(2) + '</strong>')
+                }
+            })
+        })
+    })
+</script>
+{% endblock script %}

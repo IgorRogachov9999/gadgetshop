@@ -10,10 +10,29 @@
     <p>{% lorem %}</p>
     <hr>
     <p>Price: ${{ product.price }}</p>
-    <a href="{% url 'add_to_cart' product_slug=product.slug %}"><button class="btn btn-danger">Add to cart</button></a>
+    <a href="{% url 'add_to_cart' %}" class="add-to-cart" data-slug="{{ product.slug }}"><button class="btn btn-danger">Add to cart</button></a>
 </div>
 <br>
-<script>
-    
-</script>
 {% endblock content %}
+
+{% block script %}
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart').on('click', function(e) {
+            e.preventDefault()
+            product_slug = $(this).attr('data-slug')
+            data = {
+                product_slug: product_slug
+            }
+            $.ajax({
+                type: "GET",
+                url: "{% url 'add_to_cart' %}",
+                data: data,
+                success: function(data) {
+                    $("#cart-count").html(data.cart_total)
+                }
+            })
+        })
+    })
+</script>
+{% endblock script %}
