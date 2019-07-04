@@ -7,12 +7,14 @@
         <td class="text-center"><strong>Product</strong></td>
         <td class="text-center"><strong>Count</strong></td>
         <td class="text-center"><strong>Price</strong></td>
+        <td class="text-center"></td>
     </tr>
     {% for item in cart.items.all %}
         <tr>
             <td class="text-center"><strong>{{ item.product.title }}</strong></td>
             <td class="text-center"><strong>{{ item.qty }}</strong></td>
             <td class="text-center"><strong>{{ item.item_total }}</strong></td>
+            <td class="text-center"><a href="{% url 'remove_from_cart' product_slug=item.product.slug %}">Remove</a></td>
         </tr>   
     {% endfor %}
 </table>
