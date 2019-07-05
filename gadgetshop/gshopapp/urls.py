@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth.views import LogoutView
 from gshopapp.views import (base_view, 
                            product_view, 
                            category_view, 
@@ -8,7 +9,11 @@ from gshopapp.views import (base_view,
                            change_item_qty_view, 
                            checkout_view,
                            order_create_view,
-                           thank_you_view)
+                           thank_you_view,
+                           account_view,
+                           registration_view,
+                           login_view,
+                           logout_view)
                         
 
 urlpatterns = [
@@ -21,5 +26,9 @@ urlpatterns = [
     path('checkout/', checkout_view, name='checkout'),
     path('order/', order_create_view, name='create_order'),
     path('thank_you/', thank_you_view, name='thank_you'),
+    path('account/', account_view, name='account'),
+    path('registration/', registration_view, name='registration'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
     path('cart/', cart_view, name='cart'),
 ]

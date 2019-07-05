@@ -46,11 +46,25 @@
         <li class="nav-item">
             <a class="nav-link" href="{% url 'cart' %}">Cart <span id="cart-count" class="badge">{{ cart.items.count }}</span></a>
         </li> 
+       
+          {% if not request.user.is_authenticated %} 
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'account' %}">{{ request.user }}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
+          {% endif %}
+        </li>
       </ul>
       
       </div>
   </nav>
-
+  <br>
   <!-- Page Content -->
   <div class="container">
     {% block content %}
@@ -124,6 +138,7 @@
     <!-- /.row -->
   {% endblock content %}
   </div>
+  <br>
   <!-- /.container -->
 
   <!-- Footer -->

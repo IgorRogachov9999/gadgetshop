@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br>
+<h3 class="text-center">{{ request.user }}</h3>
+<hr>
+<h4 class="text-center">Your orders</h4>
+<table class="table text-center">
+    <tr >
+        <td>Order</td>
+        <td>Date</td>
+        <td>State</td>
+        <td>Price</td>
+        <td>Details</td>
+    </tr>
+    {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.date }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.total }}</td>
+            <td>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal-{{ order.id }}">
+                            Show details
+                    </button>
+            </td>
+        </tr>
+    {% endfor %} 
+</table>
+<!-- Button trigger modal -->
+
+    {% for order in orders %}
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal-{{ order.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Order #{{ order.id }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                {% for item in order.items.all %}
+                    {% for element in item.items.all %}
+                        <tr>
+                            <td>{{ element.product.title }}</td>
+                            <td>{{ element.qty }}</td>
+                            <td>${{ element.item_total }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td>Total:</td>
+                        <td><strong>${{ item.cart_total }}</strong></td>
+                    </tr>
+                {% endfor %}
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div> 
+    {% endfor %}
+{% endblock content %}
+

@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from gshopapp.forms import OrderForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate, logout
+from gshopapp.forms import OrderForm, RegistrationForm, LoginForm
 from gshopapp.models import Category, Product, CartItem, Cart, Order
 
 
@@ -55,6 +57,7 @@ def category_view(request, category_slug):
     return render(request, 'category.html', context)
 
 
+@login_required(login_url='/login/')
 def cart_view(request):
     cart = get_cart(request)
     categories = Category.objects.all()
@@ -65,8 +68,10 @@ def cart_view(request):
     return render(request, 'cart.html', context)
 
 
+@login_required(login_url='/login/')
 def add_to_cart_view(request):
     cart = get_cart(request)
+    categories = Category.objects.all()
     product_slug = request.GET.get('product_slug')
     product = Product.objects.get(slug=product_slug)
     cart.add_to_cart(product)
@@ -77,13 +82,16 @@ def add_to_cart_view(request):
     cart.save()
     data = {
         'cart_total': cart.items.count(),
-        'cart_total_price': new_cart_total
+        'cart_total_price': new_cart_total,
+        'categories': categories
     }
     return JsonResponse(data)
 
 
+@login_required(login_url='/login/')
 def remove_from_cart_view(request):
     cart = get_cart(request)
+    categories = Category.objects.all()
     product_slug = request.GET.get('product_slug')
     product = Product.objects.get(slug=product_slug)
     cart.remove_from_cart(product)
@@ -94,13 +102,16 @@ def remove_from_cart_view(request):
     cart.save()
     data = {
         'cart_total': cart.items.count(),
-        'cart_total_price': new_cart_total
+        'cart_total_price': new_cart_total,
+        'categories': categories
     }
     return JsonResponse(data)
 
 
+@login_required(login_url='/login/')
 def change_item_qty_view(request):
     cart = get_cart(request)
+    categories = Category.objects.all()
     qty = int(request.GET.get('qty'))
     item_id = int(request.GET.get('item_id'))
     cart_item = CartItem.objects.get(id=item_id)
@@ -115,29 +126,38 @@ def change_item_qty_view(request):
     data = {
         'cart_total': cart.items.count(),
         'item_total': cart_item.item_total,
-        'cart_total_price': new_cart_total
+        'cart_total_price': new_cart_total,
+        'categories': categories
     }
     return JsonResponse(data)
 
 
+@login_required(login_url='/login/')
 def checkout_view(request):
     cart = get_cart(request)
+    categories = Category.objects.all()
     context = {
-        'cart': cart
+        'cart': cart,
+        'categories': categories
     }
     return render(request, 'checkout.html', context)
 
 
+@login_required(login_url='/login/')
 def thank_you_view(request):
     cart = get_cart(request)
+    categories = Category.objects.all()
     context = {
-        'cart': cart
+        'cart': cart,
+        'categories': categories
     }
     return render(request, 'thank_you.html', context)
 
 
+@login_required(login_url='/login/')
 def order_create_view(request):
     cart = get_cart(request)
+    categories = Category.objects.all()
     form = OrderForm(request.POST or None)
     if form.is_valid():
         name = form.cleaned_data['name']
@@ -162,7 +182,60 @@ def order_create_view(request):
         return HttpResponseRedirect(reverse('thank_you'))
     context = {
         'form': form,
-        'cart': cart
+        'cart': cart,
+        'categories': categories
     }
     return render(request, 'order.html', context)
 
+
+@login_required(login_url='/login/')
+def account_view(request):
+    orders = Order.objects.filter(user=request.user).order_by('-id')
+    categories = Category.objects.all()
+    context = {
+        'orders': orders,
+        'categories': categories
+    }
+    return render(request, 'account.html', context)
+
+
+def registration_view(request):
+    form = RegistrationForm(request.POST or None)
+    categories = Category.objects.all()
+    if form.is_valid():
+        new_user = form.save(commit=False)
+        new_user.username = form.cleaned_data['username']
+        new_user.set_password(form.cleaned_data['password'])
+        new_user.first_name = form.cleaned_data['first_name']
+        new_user.last_name = form.cleaned_data['last_name']
+        new_user.email = form.cleaned_data['email']
+        new_user.save()
+        return HttpResponseRedirect(reverse('login'))
+    context = {
+        'form': form,
+        'categories': categories
+    }
+    return render(request, 'registration.html', context)
+
+
+def login_view(request):
+    categories = Category.objects.all()
+    form = LoginForm(request.POST or None)
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        login_user = authenticate(username=username, password=password)
+        if login_user:
+            login(request, login_user)
+            return HttpResponseRedirect(reverse('base'))
+    context = {
+        'form': form,
+        'categories': categories
+    }
+    return render(request, 'login.html', context)
+
+
+@login_required(login_url='/login/')
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('base'))
